@@ -101,6 +101,7 @@ for line in hash_input:
 	#file.write(thumbnail.content)
 	url = 'http://saucenao.com/search.php?output_type=2&numres=1&minsim='+minsim+'&dbmask='+str(db_bitmask)+'&api_key='+saucenao_api_key
 	thumb_data = {'file': thumbnail.content}
+	print("Processing hash: "+str(line).rstrip())
 	
 	processResults = True
 	while True:
@@ -165,6 +166,7 @@ for line in hash_input:
 			time.sleep(6*60*60)
 		if int(results['header']['short_remaining'])<1:
 			print('Out of searches for this 30 second period. Sleeping for 25 seconds...')
-			time.sleep(25)
+			time.sleep(25)			
+		print("")
 	
 print('All Done!')
