@@ -101,7 +101,7 @@ for line in hash_input:
 	#file.write(thumbnail.content)
 	url = 'http://saucenao.com/search.php?output_type=2&numres=1&minsim='+minsim+'&dbmask='+str(db_bitmask)+'&api_key='+saucenao_api_key
 	thumb_data = {'file': thumbnail.content}
-	print("Processing hash: "+str(line).rstrip())
+	print("Processing hash: "+str(line).rstrip(), flush=True)
 	
 	processResults = True
 	while True:
@@ -118,7 +118,7 @@ for line in hash_input:
 			results = json.JSONDecoder(object_pairs_hook=OrderedDict).decode(r.text)
 			if int(results['header']['user_id'])>0:
 				#api responded
-				print('Remaining Searches 30s|24h: '+str(results['header']['short_remaining'])+'|'+str(results['header']['long_remaining']))
+				print('Remaining Searches 30s|24h: '+str(results['header']['short_remaining'])+'|'+str(results['header']['long_remaining']), flush=True)
 				if int(results['header']['status'])==0:
 					#search succeeded for all indexes, results usable
 					break
@@ -127,19 +127,19 @@ for line in hash_input:
 						#One or more indexes are having an issue.
 						#This search is considered partially successful, even if all indexes failed, so is still counted against your limit.
 						#The error may be transient, but because we don't want to waste searches, allow time for recovery.
-						print('API Error. Retrying in 600 seconds...')
+						print('API Error. Retrying in 600 seconds...', flush=True)
 						time.sleep(600)
 					else:
 						#Problem with search as submitted, bad image, or impossible request.
 						#Issue is unclear, so don't flood requests.
-						print('Bad image or other request error. Skipping in 10 seconds...')
+						print('Bad image or other request error. Skipping in 10 seconds...', flush=True)
 						processResults = False
 						time.sleep(10)
 						break
 			else:
 				#General issue, api did not respond. Normal site took over for this error state.
 				#Issue is unclear, so don't flood requests.
-				print('Bad image, or API failure. Skipping in 10 seconds...')
+				print('Bad image, or API failure. Skipping in 10 seconds...', flush=True)
 				processResults = False
 				time.sleep(10)
 				break
@@ -150,22 +150,22 @@ for line in hash_input:
 		if int(results['header']['results_returned']) > 0:
 			#one or more results were returned
 			if float(results['results'][0]['header']['similarity']) > float(results['header']['minimum_similarity']):
-				print('hit! '+str(results['results'][0]['header']['similarity']))
+				print('hit! '+str(results['results'][0]['header']['similarity']), flush=True)
 				file_url=results['results'][0]['data']['ext_urls'][0]
 				
 				client.add_url(url=file_url, page_name=hydrus_page_name)
 				
 			else:
-				print('miss... '+str(results['results'][0]['header']['similarity']))
+				print('miss... '+str(results['results'][0]['header']['similarity']), flush=True)
 				
 		else:
 			print('no results... ;_;')
 
 		if int(results['header']['long_remaining'])<1: #could potentially be negative
-			print('Out of searches for today. Sleeping for 6 hours...')
+			print('Out of searches for today. Sleeping for 6 hours...', flush=True)
 			time.sleep(6*60*60)
 		if int(results['header']['short_remaining'])<1:
-			print('Out of searches for this 30 second period. Sleeping for 25 seconds...')
+			print('Out of searches for this 30 second period. Sleeping for 25 seconds...', flush=True)
 			time.sleep(25)			
 		print("")
 	
