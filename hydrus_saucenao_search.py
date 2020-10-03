@@ -55,7 +55,7 @@ try:
 	index_animeop = config['SauceNao_Indexes']['animeop']
 	index_shutterstock = config['SauceNao_Indexes']['shutterstock']
 	index_fakku = config['SauceNao_Indexes']['fakku']
-	index_hmisc = config['SauceNao_Indexes']['hmisc']
+	index_hmisc = config['SauceNao_Indexes']['nhentai']
 	index_2dmarket = config['SauceNao_Indexes']['2dmarket']
 	index_medibang = config['SauceNao_Indexes']['medibang']
 	index_anime = config['SauceNao_Indexes']['anime']
@@ -75,6 +75,7 @@ try:
 	index_pawoo = config['SauceNao_Indexes']['pawoo']
 	index_madokami = config['SauceNao_Indexes']['madokami']
 	index_mangadex = config['SauceNao_Indexes']['mangadex']
+	index_ehentai = config['SauceNao_Indexes']['ehentai']
 except FileNotFoundError:
 	print("Config.ini not found!\nGenerating default configuration...")
 	config["General"] = {"hash_file": "hashes.txt"}
@@ -95,7 +96,7 @@ except FileNotFoundError:
 		"animeop": "0",
 		"shutterstock": "0",
 		"fakku": "0",
-		"hmisc": "0",
+		"nhentai": "0",
 		"2dmarket": "0",
 		"medibang": "0",
 		"anime": "0",
@@ -114,7 +115,8 @@ except FileNotFoundError:
 		"da": "1",
 		"pawoo": "0",
 		"madokami": "0",
-		"mangadex": "0"}
+		"mangadex": "0",
+		"ehentai": "0"}
 	with open("config.ini", "w") as configfile:
 		config.write(configfile)
 	print("Please edit config.ini before running this script again.")
@@ -129,7 +131,7 @@ except FileNotFoundError:
 hydrus_permissions = [hydrus.Permission.SearchFiles, hydrus.Permission.ImportURLs]
 
 #generate appropriate bitmask
-db_bitmask = int(index_mangadex+index_madokami+index_pawoo+index_da+index_portalgraphics+index_bcycosplay+index_bcyillust+index_idolcomplex+index_e621+index_animepictures+index_sankaku+index_konachan+index_gelbooru+index_shows+index_movies+index_hanime+index_anime+index_medibang+index_2dmarket+index_hmisc+index_fakku+index_shutterstock+index_reserved+index_animeop+index_yandere+index_nijie+index_drawr+index_danbooru+index_seigaillust+index_anime+index_pixivhistorical+index_pixiv+index_ddbsamples+index_ddbobjects+index_hcg+index_hanime+index_hmags,2)
+db_bitmask = int(index_ehentai+index_mangadex+index_madokami+index_pawoo+index_da+index_portalgraphics+index_bcycosplay+index_bcyillust+index_idolcomplex+index_e621+index_animepictures+index_sankaku+index_konachan+index_gelbooru+index_shows+index_movies+index_hanime+index_anime+index_medibang+index_2dmarket+index_hmisc+index_fakku+index_shutterstock+index_reserved+index_animeop+index_yandere+index_nijie+index_drawr+index_danbooru+index_seigaillust+index_anime+index_pixivhistorical+index_pixiv+index_ddbsamples+index_ddbobjects+index_hcg+index_hanime+index_hmags,2)
 print("dbmask="+str(db_bitmask))
 #encoded print - handle random crap
 def printe(line):
