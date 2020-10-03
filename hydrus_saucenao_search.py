@@ -1,10 +1,9 @@
 #!/usr/bin/env python -u
+
 #Let me just preface this by saying "I don't know Python."
-#For instance, WTF is that line above this? Is it important? It's commented, but is it an actual comment? Fuck.
-#And just what is going on with stdout and stderr below? I read about what all that does, but I can't figure out why.
 #The only actual languages I've worked with previously are C++ and Pascal, and both were very limited experiences.
 #I've only made anything even remotely complex from scratch with Windows CMD scripts and jQuery userscripts.
-#When I do this, I don't know what the hell I'm doing, so the core of this is copied from identify_images_v1.1.py, an example script from SauceNAO.
+#When I do this, I don't know what I'm doing, so the core of this is copied from identify_images_v1.1.py, an example script from SauceNAO.
 #Just about everything else in this script is thanks to search engines and online tutorials.
 
 #Necessary Hydrus permissions: Import URLs, Search Files
@@ -12,18 +11,7 @@
 #This script requires Python 3+, Requests, and Hydrus-API: 'pip install requests' and 'pip install hydrus-api'
 
 #THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
-#################CONFIG##################
-#In the future, this config should hopefully be external.
 
-saucenao_api_key="!!!REPLACE THIS WITH YOUR API KEY!!!"
-hydrus_api_key="!!!REPLACE THIS WITH YOUR API KEY!!!"
-hydrus_api_url="http://127.0.0.1:45869/" #This is the default API URL. Adjust as needed.
-hydrus_page_name="HydrausNao"
-EnableRename=False
-minsim='80!'#forcing minsim to 80 is generally safe for complex images, but may miss some edge cases. If images being checked are primarily low detail, such as simple sketches on white paper, increase this to cut down on false positives.
-hash_file="hashes.txt"
-
-##############END CONFIG#################
 import sys
 import os
 import io
@@ -34,52 +22,111 @@ import hydrus.utils
 import json
 import codecs
 import time
+import configparser
 from collections import OrderedDict
 sys.stdout = codecs.getwriter('utf8')(sys.stdout.detach())
 sys.stderr = codecs.getwriter('utf8')(sys.stderr.detach())
 
-hash_input = open(hash_file)
+config = configparser.ConfigParser()
+try:
+	config.read_file(open("config.ini"))
+	#general
+	hash_file = config['General']['hash_file']
+	#hydrus
+	hydrus_api_key = config['Hydrus']['api_key']
+	hydrus_api_url = config['Hydrus']['api_url']
+	hydrus_page_name = config['Hydrus']['results_page_name']
+	#saucenao
+	saucenao_api_key = config['SauceNao']['api_key']
+	minsim = config['SauceNao']['minsim']
+	#saucenao_indexes
+	index_hmags = config['SauceNao_Indexes']['hmags']
+	index_reserved = config['SauceNao_Indexes']['reserved']
+	index_hcg = config['SauceNao_Indexes']['hcg']
+	index_ddbobjects = config['SauceNao_Indexes']['ddbobjects']
+	index_ddbsamples = config['SauceNao_Indexes']['ddbsamples']
+	index_pixiv = config['SauceNao_Indexes']['pixiv']
+	index_pixivhistorical = config['SauceNao_Indexes']['pixivhistorical']
+	index_seigaillust = config['SauceNao_Indexes']['seigaillust']
+	index_danbooru = config['SauceNao_Indexes']['danbooru']
+	index_drawr = config['SauceNao_Indexes']['drawr']
+	index_nijie = config['SauceNao_Indexes']['nijie']
+	index_yandere = config['SauceNao_Indexes']['yandere']
+	index_animeop = config['SauceNao_Indexes']['animeop']
+	index_shutterstock = config['SauceNao_Indexes']['shutterstock']
+	index_fakku = config['SauceNao_Indexes']['fakku']
+	index_hmisc = config['SauceNao_Indexes']['hmisc']
+	index_2dmarket = config['SauceNao_Indexes']['2dmarket']
+	index_medibang = config['SauceNao_Indexes']['medibang']
+	index_anime = config['SauceNao_Indexes']['anime']
+	index_hanime = config['SauceNao_Indexes']['hanime']
+	index_movies = config['SauceNao_Indexes']['movies']
+	index_shows = config['SauceNao_Indexes']['shows']
+	index_gelbooru = config['SauceNao_Indexes']['gelbooru']
+	index_konachan = config['SauceNao_Indexes']['konachan']
+	index_sankaku = config['SauceNao_Indexes']['sankaku']
+	index_animepictures = config['SauceNao_Indexes']['animepictures']
+	index_e621 = config['SauceNao_Indexes']['e621']
+	index_idolcomplex = config['SauceNao_Indexes']['idolcomplex']
+	index_bcyillust = config['SauceNao_Indexes']['bcyillust']
+	index_bcycosplay = config['SauceNao_Indexes']['bcycosplay']
+	index_portalgraphics = config['SauceNao_Indexes']['portalgraphics']
+	index_da = config['SauceNao_Indexes']['da']
+	index_pawoo = config['SauceNao_Indexes']['pawoo']
+	index_madokami = config['SauceNao_Indexes']['madokami']
+	index_mangadex = config['SauceNao_Indexes']['mangadex']
+except FileNotFoundError:
+	print("Config.ini not found!\nGenerating default configuration...")
+	config["General"] = {"hash_file": "hashes.txt"}
+	config["Hydrus"] = {"Api_Key": "!!REPLACE WITH YOUR HYDRUS API KEY!!", "Api_Url": "http://127.0.0.1:45869/", "results_Page_Name": "HydrausNao"}
+	config["SauceNao"] = {"Api_Key": "!!REPLACE WITH YOUR SAUCENAO API KEY!!", "Minsim": "80!"}
+	config["SauceNao_Indexes"] = {"hmags": "0",
+		"reserved": "0",
+		"hcg": "0",
+		"ddbobjects": "0",
+		"ddbsamples": "0",
+		"pixiv": "1",
+		"pixivhistorical": "0",
+		"seigaillust": "0",
+		"danbooru": "1",
+		"drawr": "1",
+		"nijie": "1",
+		"yandere": "0",
+		"animeop": "0",
+		"shutterstock": "0",
+		"fakku": "0",
+		"hmisc": "0",
+		"2dmarket": "0",
+		"medibang": "0",
+		"anime": "0",
+		"hanime": "0",
+		"movies": "0",
+		"shows": "0",
+		"gelbooru": "1",
+		"konachan": "1",
+		"sankaku": "1",
+		"animepictures": "0",
+		"e621": "1",
+		"idolcomplex": "0",
+		"bcyillust": "0",
+		"bcycosplay": "0",
+		"portalgraphics": "0",
+		"da": "1",
+		"pawoo": "0",
+		"madokami": "0",
+		"mangadex": "0"}
+	with open("config.ini", "w") as configfile:
+		config.write(configfile)
+	print("Please edit config.ini before running this script again.")
+	sys.exit(3)
+
+try:
+	hash_input = open(hash_file)
+except FileNotFoundError:
+	print("Hash file not found!\n", hash_file, "\nTerminating...")
+	sys.exit(4)
 
 hydrus_permissions = [hydrus.Permission.SearchFiles, hydrus.Permission.ImportURLs]
-
-#enable or disable indexes
-index_hmags='0'
-index_reserved='0'
-index_hcg='0'
-index_ddbobjects='0'
-index_ddbsamples='0'
-index_pixiv='1'
-index_pixivhistorical='1'
-index_reserved='0'
-index_seigaillust='0'
-index_danbooru='1'
-index_drawr='1'
-index_nijie='1'
-index_yandere='0'
-index_animeop='0'
-index_reserved='0'
-index_shutterstock='0'
-index_fakku='0'
-index_hmisc='0'
-index_2dmarket='0'
-index_medibang='0'
-index_anime='0'
-index_hanime='0'
-index_movies='0'
-index_shows='0'
-index_gelbooru='1'
-index_konachan='1'
-index_sankaku='1'
-index_animepictures='0'
-index_e621='1'
-index_idolcomplex='0'
-index_bcyillust='0'
-index_bcycosplay='0'
-index_portalgraphics='0'
-index_da='1'
-index_pawoo='0'
-index_madokami='0'
-index_mangadex='0'
 
 #generate appropriate bitmask
 db_bitmask = int(index_mangadex+index_madokami+index_pawoo+index_da+index_portalgraphics+index_bcycosplay+index_bcyillust+index_idolcomplex+index_e621+index_animepictures+index_sankaku+index_konachan+index_gelbooru+index_shows+index_movies+index_hanime+index_anime+index_medibang+index_2dmarket+index_hmisc+index_fakku+index_shutterstock+index_reserved+index_animeop+index_yandere+index_nijie+index_drawr+index_danbooru+index_seigaillust+index_anime+index_pixivhistorical+index_pixiv+index_ddbsamples+index_ddbobjects+index_hcg+index_hanime+index_hmags,2)
@@ -108,7 +155,7 @@ for line in hash_input:
 		r = requests.post(url, files=thumb_data)
 		if r.status_code != 200:
 			if r.status_code == 403:
-				print('Incorrect or Invalid API Key! Please Edit Script to Configure...')
+				print('Incorrect or invalid API key! Please edit config.ini...')
 				sys.exit(2)
 			else:
 				#generally non 200 statuses are due to either overloaded servers or the user is out of searches
@@ -127,7 +174,7 @@ for line in hash_input:
 						#One or more indexes are having an issue.
 						#This search is considered partially successful, even if all indexes failed, so is still counted against your limit.
 						#The error may be transient, but because we don't want to waste searches, allow time for recovery.
-						print('API Error. Retrying in 600 seconds...', flush=True)
+						print('API error. Retrying in 600 seconds...', flush=True)
 						time.sleep(600)
 					else:
 						#Problem with search as submitted, bad image, or impossible request.
