@@ -29,7 +29,53 @@ sys.stderr = codecs.getwriter('utf8')(sys.stderr.detach())
 
 config = configparser.ConfigParser()
 try:
-	config.read_file(open("config.ini"))
+	config.read_file(open("config_default.ini"))
+except FileNotFoundError:
+	print("config_default.ini not found!\nGenerating default configuration...")
+	config["General"] = {"hash_file": "hashes.txt"}
+	config["Hydrus"] = {"api_key": "", "api_url": "http://127.0.0.1:45869/", "results_Page_Name": "HydrausNao"}
+	config["SauceNao"] = {"api_key": "", "minsim": "80!"}
+	config["SauceNao_Indexes"] = {"hmags": "0",
+		"reserved": "0",
+		"hcg": "0",
+		"ddbobjects": "0",
+		"ddbsamples": "0",
+		"pixiv": "1",
+		"pixivhistorical": "0",
+		"seigaillust": "0",
+		"danbooru": "1",
+		"drawr": "0",
+		"nijie": "1",
+		"yandere": "1",
+		"animeop": "0",
+		"shutterstock": "0",
+		"fakku": "0",
+		"nhentai": "0",
+		"2dmarket": "0",
+		"medibang": "0",
+		"anime": "0",
+		"hanime": "0",
+		"movies": "0",
+		"shows": "0",
+		"gelbooru": "1",
+		"konachan": "1",
+		"sankaku": "1",
+		"animepictures": "0",
+		"e621": "1",
+		"idolcomplex": "0",
+		"bcyillust": "0",
+		"bcycosplay": "0",
+		"portalgraphics": "0",
+		"da": "1",
+		"pawoo": "0",
+		"madokami": "0",
+		"mangadex": "0",
+		"ehentai": "0"}
+	with open("config_default.ini", "w") as defconfigfile:
+		config.write(defconfigfile)
+	#print("Please edit config.ini before running this script again.")
+finally:
+	config.read('config.ini')
 	#general
 	hash_file = config['General']['hash_file']
 	#hydrus
@@ -76,57 +122,28 @@ try:
 	index_madokami = config['SauceNao_Indexes']['madokami']
 	index_mangadex = config['SauceNao_Indexes']['mangadex']
 	index_ehentai = config['SauceNao_Indexes']['ehentai']
-except FileNotFoundError:
-	print("Config.ini not found!\nGenerating default configuration...")
-	config["General"] = {"hash_file": "hashes.txt"}
-	config["Hydrus"] = {"Api_Key": "!!REPLACE WITH YOUR HYDRUS API KEY!!", "Api_Url": "http://127.0.0.1:45869/", "results_Page_Name": "HydrausNao"}
-	config["SauceNao"] = {"Api_Key": "!!REPLACE WITH YOUR SAUCENAO API KEY!!", "Minsim": "80!"}
-	config["SauceNao_Indexes"] = {"hmags": "0",
-		"reserved": "0",
-		"hcg": "0",
-		"ddbobjects": "0",
-		"ddbsamples": "0",
-		"pixiv": "1",
-		"pixivhistorical": "0",
-		"seigaillust": "0",
-		"danbooru": "1",
-		"drawr": "0",
-		"nijie": "1",
-		"yandere": "1",
-		"animeop": "0",
-		"shutterstock": "0",
-		"fakku": "0",
-		"nhentai": "0",
-		"2dmarket": "0",
-		"medibang": "0",
-		"anime": "0",
-		"hanime": "0",
-		"movies": "0",
-		"shows": "0",
-		"gelbooru": "1",
-		"konachan": "1",
-		"sankaku": "1",
-		"animepictures": "0",
-		"e621": "1",
-		"idolcomplex": "0",
-		"bcyillust": "0",
-		"bcycosplay": "0",
-		"portalgraphics": "0",
-		"da": "1",
-		"pawoo": "0",
-		"madokami": "0",
-		"mangadex": "0",
-		"ehentai": "0"}
-	with open("config.ini", "w") as configfile:
-		config.write(configfile)
-	print("Please edit config.ini before running this script again.")
-	sys.exit(3)
 
 try:
 	hash_input = open(hash_file)
 except FileNotFoundError:
 	print("Hash file not found!\n", hash_file, "\nTerminating...")
 	sys.exit(4)
+	
+if not hydrus_api_key  or not saucenao_api_key:
+	print("One or more API keys missing.")
+	try:
+		configfile = open("config.ini")
+	except FileNotFoundError:
+		print("Additionally, config.ini was not found.")
+		config.remove_section("General")
+		config.remove_section("SauceNao_Indexes")
+		config["Hydrus"] = {"api_key": ""}
+		config["SauceNao"] = {"api_key": ""}
+		with open("config.ini", "w") as configfile:
+			config.write(configfile)
+		print("A default config.ini has been created.")
+	print("Please update config.ini before continuing.")
+	sys.exit(5)
 
 hydrus_permissions = [hydrus.Permission.SearchFiles, hydrus.Permission.ImportURLs]
 
@@ -138,10 +155,16 @@ def printe(line):
     print(str(line).encode(sys.getdefaultencoding(), 'replace')) #ignore or replace
 	
 client = hydrus.Client(hydrus_api_key, hydrus_api_url)
-	
-if not hydrus.utils.verify_permissions(client, hydrus_permissions):
-	print("The Hydrus API key does not grant all required permissions:", hydrus_permissions)
-	sys.exit(1)
+
+try:
+	p = hydrus.utils.verify_permissions(client, hydrus_permissions)
+except:
+	print("Hydrus-API encountered a server error.\nHydrus API key may be malformed.")
+	sys.exit(6)
+else:
+	if not hydrus.utils.verify_permissions(client, hydrus_permissions):
+		print("The Hydrus API key does not grant all required permissions:", hydrus_permissions)
+		sys.exit(1)
 
 	
 for line in hash_input:
