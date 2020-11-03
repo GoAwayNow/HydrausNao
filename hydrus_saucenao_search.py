@@ -66,7 +66,7 @@ except FileNotFoundError:
 		"bcyillust": "0",
 		"bcycosplay": "0",
 		"portalgraphics": "0",
-		"da": "1",
+		"da": "0",
 		"pawoo": "0",
 		"madokami": "0",
 		"mangadex": "0",
