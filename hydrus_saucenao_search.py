@@ -36,7 +36,7 @@ except FileNotFoundError:
 	config["Hydrus"] = {"api_key": "", "api_url": "http://127.0.0.1:45869/", "results_Page_Name": "HydrausNao"}
 	config["SauceNao"] = {"api_key": "", "minsim": "80!"}
 	config["SauceNao_Indexes"] = {"hmags": "0",
-		"reserved": "0",
+		"imdb": "0",
 		"hcg": "0",
 		"ddbobjects": "0",
 		"ddbsamples": "0",
@@ -70,7 +70,11 @@ except FileNotFoundError:
 		"pawoo": "0",
 		"madokami": "0",
 		"mangadex": "0",
-		"ehentai": "0"}
+		"ehentai": "0",
+		"artstation": "0",
+		"furaffinity": "0",
+		"twitter": "1",
+		"furrynetwork": "0"}
 	with open("config_default.ini", "w") as defconfigfile:
 		config.write(defconfigfile)
 	#print("Please edit config.ini before running this script again.")
@@ -87,7 +91,7 @@ finally:
 	minsim = config['SauceNao']['minsim']
 	#saucenao_indexes
 	index_hmags = config['SauceNao_Indexes']['hmags']
-	index_reserved = config['SauceNao_Indexes']['reserved']
+	index_imdb = config['SauceNao_Indexes']['imdb']
 	index_hcg = config['SauceNao_Indexes']['hcg']
 	index_ddbobjects = config['SauceNao_Indexes']['ddbobjects']
 	index_ddbsamples = config['SauceNao_Indexes']['ddbsamples']
@@ -122,6 +126,10 @@ finally:
 	index_madokami = config['SauceNao_Indexes']['madokami']
 	index_mangadex = config['SauceNao_Indexes']['mangadex']
 	index_ehentai = config['SauceNao_Indexes']['ehentai']
+	index_artstation = config['SauceNao_Indexes']['artstation']
+	index_fa = config['SauceNao_Indexes']['furaffinity']
+	index_twitter = config['SauceNao_Indexes']['twitter']
+	index_furnet = config['SauceNao_Indexes']['furrynetwork']
 
 try:
 	hash_input = open(hash_file)
@@ -148,7 +156,7 @@ if not hydrus_api_key  or not saucenao_api_key:
 hydrus_permissions = [hydrus.Permission.SearchFiles, hydrus.Permission.ImportURLs]
 
 #generate appropriate bitmask
-db_bitmask = int(index_ehentai+index_mangadex+index_madokami+index_pawoo+index_da+index_portalgraphics+index_bcycosplay+index_bcyillust+index_idolcomplex+index_e621+index_animepictures+index_sankaku+index_konachan+index_gelbooru+index_shows+index_movies+index_hanime+index_anime+index_medibang+index_2dmarket+index_hmisc+index_fakku+index_shutterstock+index_reserved+index_animeop+index_yandere+index_nijie+index_drawr+index_danbooru+index_seigaillust+index_anime+index_pixivhistorical+index_pixiv+index_ddbsamples+index_ddbobjects+index_hcg+index_hanime+index_hmags,2)
+db_bitmask = int(index_furnet+index_twitter+index_fa+index_artstation+index_ehentai+index_mangadex+index_madokami+index_pawoo+index_da+index_portalgraphics+index_bcycosplay+index_bcyillust+index_idolcomplex+index_e621+index_animepictures+index_sankaku+index_konachan+index_gelbooru+index_shows+index_movies+index_hanime+index_anime+index_medibang+index_2dmarket+index_hmisc+index_fakku+index_shutterstock+index_imdb+index_animeop+index_yandere+index_nijie+index_drawr+index_danbooru+index_seigaillust+index_anime+index_pixivhistorical+index_pixiv+index_ddbsamples+index_ddbobjects+index_hcg+index_hanime+index_hmags,2)
 print("dbmask="+str(db_bitmask))
 #encoded print - handle random crap
 def printe(line):
