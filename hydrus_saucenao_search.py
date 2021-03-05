@@ -19,6 +19,7 @@ import unicodedata
 import requests
 import hydrus
 import hydrus.utils
+from saucenao_api import SauceNao
 import json
 import codecs
 import time
@@ -155,12 +156,20 @@ if not hydrus_api_key  or not saucenao_api_key:
 
 hydrus_permissions = [hydrus.Permission.SearchFiles, hydrus.Permission.ImportURLs]
 
+#hydrus_permissions.append(hydrus.Permission.AddTags)
+
+
 #generate appropriate bitmask
 db_bitmask = int(index_furnet+index_twitter+index_fa+index_artstation+index_ehentai+index_mangadex+index_madokami+index_pawoo+index_da+index_portalgraphics+index_bcycosplay+index_bcyillust+index_idolcomplex+index_e621+index_animepictures+index_sankaku+index_konachan+index_gelbooru+index_shows+index_movies+index_hanime+index_anime+index_medibang+index_2dmarket+index_hmisc+index_fakku+index_shutterstock+index_imdb+index_animeop+index_yandere+index_nijie+index_drawr+index_danbooru+index_seigaillust+index_anime+index_pixivhistorical+index_pixiv+index_ddbsamples+index_ddbobjects+index_hcg+index_hanime+index_hmags,2)
 print("dbmask="+str(db_bitmask))
 #encoded print - handle random crap
 def printe(line):
     print(str(line).encode(sys.getdefaultencoding(), 'replace')) #ignore or replace
+	
+sauce = SauceNao(api_key=saucenao_api_key,
+				dbmask=db_bitmask,
+				numres=1,
+)
 	
 client = hydrus.Client(hydrus_api_key, hydrus_api_url)
 
@@ -174,7 +183,52 @@ else:
 		print("The Hydrus API key does not grant all required permissions:", hydrus_permissions)
 		sys.exit(1)
 
+
+for line in hash_input:
+	thumbnail = client.get_thumbnail(hash_=line)
+	print("Processing hash: "+str(line).rstrip(), flush=True)
 	
+	retries = 0
+	#As of this commit, this looping and retrying isn't tested. Fingers crossed.
+	while True:
+		try:
+			results = sauce.from_file(thumbnail.content)
+		except saucenao_api.errors.ShortLimitReachedError as e:
+			print(str(e)+". Retrying in 30 seconds...", flush=True)
+			time.sleep(30)
+			continue
+		except saucenao_api.errors.LongLimitReachedError as e:
+			print(str(e)+". Retrying in 24 hours...", flush=True)
+			time.sleep(24*60*60)
+			continue
+		except saucenao_api.errors.UnknownClientError as e:
+			sys.exit(str(e))
+		except saucenao_api.errors.UnknownServerError as e:
+			sys.exit(str(e))
+		except saucenao_api.errors.UnknownApiError as e:
+			if retries < 4:
+				print(str(e)+". Retrying in 10 minutes...", flush=True)
+				retries += 1
+				time.sleep(600)
+				continue
+			else:
+				sys.exit(str(e)+". Maximum reties reached.")
+		except saucenao_api.errors.BadFileSizeError as e:
+			print(str(e)+". This should be impossible. Skipping...", flush=True)
+			time.sleep(10)
+			break
+		else:
+			if results:
+				if results[0].similarity > float(minsim.strip('!')):
+					print('hit! '+str(results[0].similarity), flush=True)
+					client.add_url(url=results[0].urls[0], page_name=hydrus_page_name)
+				else:
+					print('miss... '+str(results[0].similarity), flush=True)
+			else:
+				print('no results... ;_;', flush=True)
+			break
+	
+"""	
 for line in hash_input:
 	thumbnail = client.get_thumbnail(hash_=line)
 	#file = open("fileout", "wb")
@@ -259,5 +313,6 @@ for line in hash_input:
 			print('Out of searches for this 30 second period. Sleeping for 25 seconds...', flush=True)
 			time.sleep(25)			
 		print("")
+"""
 	
 print('All Done!')
