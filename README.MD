@@ -5,8 +5,8 @@ A script to automatically search SauceNao for images and send results to Hydrus 
 
 ## Requirements
 * Python 3+
-* Requests (`pip install -U requests`)
-* Hydrus-API (`pip install -U hydrus-api`)
+* SauceNao-API `pip install -U saucenao_api`
+* Hydrus-API `pip install -U hydrus-api`
 
 ## Use
 1. In your Hydrus Client, the Client API must be enabled, and a key with the permissions "Add URLs" and "Search Files" must be created
@@ -25,4 +25,4 @@ If your config_default.ini becomes somehow damaged, you can delete it and run th
 
 ### Credits
 
-This script is based directly upon [Identify and Rename Images 1.1](https://saucenao.com/tools/examples/api/identify_images_v1.1.py), the API example script provided by SauceNao.
+This script is based heavily upon [Identify and Rename Images 1.1](https://saucenao.com/tools/examples/api/identify_images_v1.1.py), the API example script provided by SauceNao.
