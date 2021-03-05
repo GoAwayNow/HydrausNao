@@ -20,7 +20,6 @@ import requests
 import hydrus
 import hydrus.utils
 from saucenao_api import SauceNao, errors
-import json
 import codecs
 import time
 import configparser
@@ -237,92 +236,5 @@ for line in hash_input:
 				short_pause = True
 			print("")
 			break
-	
-"""	
-for line in hash_input:
-	thumbnail = client.get_thumbnail(hash_=line)
-	#file = open("fileout", "wb")
-	#file.write(thumbnail.content)
-	url = 'http://saucenao.com/search.php?output_type=2&numres=1&minsim='+minsim+'&dbmask='+str(db_bitmask)+'&api_key='+saucenao_api_key
-	thumb_data = {'file': thumbnail.content}
-	print("Processing hash: "+str(line).rstrip(), flush=True)
-	
-	processResults = True
-	while True:
-		try:
-			r = requests.post(url, files=thumb_data)
-		except requests.exceptions.Timeout:
-			print('Connection timeout! Retrying in 10 minutes...')
-			time.sleep(600)
-		except:
-			print('Connection error! Retrying in 10 minutes...')
-			time.sleep(600)
-		else:
-			if r.status_code != 200:
-				if r.status_code == 403:
-					print('Incorrect or invalid API key! Please edit config.ini...')
-					sys.exit(2)
-				elif r.status_code == 429:
-					print('Daily search limit exceeded! Sleeping for 24 hours...', flush=True)
-					time.sleep(24*60*60)
-				else:
-					#generally non 200 statuses are due to either overloaded servers or the user is out of searches
-					print("status code: "+str(r.status_code), flush=True)
-					time.sleep(10)
-			else:
-				results = json.JSONDecoder(object_pairs_hook=OrderedDict).decode(r.text)
-				if int(results['header']['user_id'])>0:
-					#api responded
-					print('Remaining Searches 30s|24h: '+str(results['header']['short_remaining'])+'|'+str(results['header']['long_remaining']), flush=True)
-					if int(results['header']['status'])==0:
-						#search succeeded for all indexes, results usable
-						break
-					else:
-						if int(results['header']['status'])>0:
-							#One or more indexes are having an issue.
-							#This search is considered partially successful, even if all indexes failed, so is still counted against your limit.
-							#The error may be transient, but because we don't want to waste searches, allow time for recovery.
-							print('API error. Retrying in 10 minutes...', flush=True)
-							time.sleep(600)
-						else:
-							#Problem with search as submitted, bad image, or impossible request.
-							#Issue is unclear, so don't flood requests.
-							print('Bad image or other request error. Skipping in 10 seconds...', flush=True)
-							processResults = False
-							time.sleep(10)
-							break
-				else:
-					#General issue, api did not respond. Normal site took over for this error state.
-					#Issue is unclear, so don't flood requests.
-					print('Bad image, or API failure. Skipping in 10 seconds...', flush=True)
-					processResults = False
-					time.sleep(10)
-					break
-	
-	if processResults:
-		#print(results)
-		
-		if int(results['header']['results_returned']) > 0:
-			#one or more results were returned
-			if float(results['results'][0]['header']['similarity']) > float(results['header']['minimum_similarity']):
-				print('hit! '+str(results['results'][0]['header']['similarity']), flush=True)
-				file_url=results['results'][0]['data']['ext_urls'][0]
-				
-				client.add_url(url=file_url, page_name=hydrus_page_name)
-				
-			else:
-				print('miss... '+str(results['results'][0]['header']['similarity']), flush=True)
-				
-		else:
-			print('no results... ;_;')
-
-		if int(results['header']['long_remaining'])<1: #could potentially be negative
-			print('Out of searches for today. Sleeping for 24 hours...', flush=True)
-			time.sleep(24*60*60)
-		if int(results['header']['short_remaining'])<1:
-			print('Out of searches for this 30 second period. Sleeping for 25 seconds...', flush=True)
-			time.sleep(25)			
-		print("")
-"""
 	
 print('All Done!')
