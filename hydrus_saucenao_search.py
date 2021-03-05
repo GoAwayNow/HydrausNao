@@ -19,7 +19,7 @@ import unicodedata
 import requests
 import hydrus
 import hydrus.utils
-from saucenao_api import SauceNao
+from saucenao_api import SauceNao, errors
 import json
 import codecs
 import time
@@ -183,29 +183,33 @@ else:
 		print("The Hydrus API key does not grant all required permissions:", hydrus_permissions)
 		sys.exit(1)
 
+short_pause = False
 
 for line in hash_input:
+	if short_pause:
+		print('Out of searches for this 30 second period. Sleeping for 30 seconds...', flush=True)
+		time.sleep(30)
+	short_pause = False
 	thumbnail = client.get_thumbnail(hash_=line)
 	print("Processing hash: "+str(line).rstrip(), flush=True)
 	
 	retries = 0
-	#As of this commit, this looping and retrying isn't tested. Fingers crossed.
 	while True:
 		try:
 			results = sauce.from_file(thumbnail.content)
-		except saucenao_api.errors.ShortLimitReachedError as e:
-			print(str(e)+". Retrying in 30 seconds...", flush=True)
-			time.sleep(30)
+		except errors.ShortLimitReachedError as e:
+			print(str(e)+". Retrying in 2 minutes...", flush=True)
+			time.sleep(2*60)
 			continue
-		except saucenao_api.errors.LongLimitReachedError as e:
+		except errors.LongLimitReachedError as e:
 			print(str(e)+". Retrying in 24 hours...", flush=True)
 			time.sleep(24*60*60)
 			continue
-		except saucenao_api.errors.UnknownClientError as e:
+		except errors.UnknownClientError as e:
 			sys.exit(str(e))
-		except saucenao_api.errors.UnknownServerError as e:
+		except errors.UnknownServerError as e:
 			sys.exit(str(e))
-		except saucenao_api.errors.UnknownApiError as e:
+		except errors.UnknownApiError as e:
 			if retries < 4:
 				print(str(e)+". Retrying in 10 minutes...", flush=True)
 				retries += 1
@@ -213,7 +217,7 @@ for line in hash_input:
 				continue
 			else:
 				sys.exit(str(e)+". Maximum reties reached.")
-		except saucenao_api.errors.BadFileSizeError as e:
+		except errors.BadFileSizeError as e:
 			print(str(e)+". This should be impossible. Skipping...", flush=True)
 			time.sleep(10)
 			break
@@ -221,11 +225,17 @@ for line in hash_input:
 			if results:
 				if results[0].similarity > float(minsim.strip('!')):
 					print('hit! '+str(results[0].similarity), flush=True)
+					#client.add_tags(hashes=line.splitlines(), service_to_tags={"my tags": ['hydrausnao:hit']})
 					client.add_url(url=results[0].urls[0], page_name=hydrus_page_name)
 				else:
 					print('miss... '+str(results[0].similarity), flush=True)
+					#client.add_tags(hashes=line.splitlines(), service_to_tags={"my tags": ['hydrausnao:miss']})
 			else:
 				print('no results... ;_;', flush=True)
+				#client.add_tags(hashes=line.splitlines(), service_to_tags={"my tags": ['hydrausnao:miss']})
+			if results.short_remaining < 1:
+				short_pause = True
+			print("")
 			break
 	
 """	
