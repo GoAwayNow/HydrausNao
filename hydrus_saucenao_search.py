@@ -7,6 +7,7 @@
 #Just about everything else in this script is thanks to search engines and online tutorials.
 
 #Necessary Hydrus permissions: Import URLs, Search Files
+# Add Tags is also required if tagging is enabled
 
 #This script requires Python 3+, Requests, and Hydrus-API: 'pip install requests' and 'pip install hydrus-api'
 
@@ -34,6 +35,7 @@ except FileNotFoundError:
 	print("config_default.ini not found!\nGenerating default configuration...")
 	config["General"] = {"hash_file": "hashes.txt"}
 	config["Hydrus"] = {"api_key": "", "api_url": "http://127.0.0.1:45869/", "results_Page_Name": "HydrausNao"}
+	config["Hydrus_Meta_Tags"] = {"enable": "1", "namespace": "hydrausnao", "hit": "hit", "miss": "miss", "no_result": "no_result"}
 	config["SauceNao"] = {"api_key": "", "minsim": "80!"}
 	config["SauceNao_Indexes"] = {"hmags": "0",
 		"imdb": "0",
@@ -86,6 +88,13 @@ finally:
 	hydrus_api_key = config['Hydrus']['api_key']
 	hydrus_api_url = config['Hydrus']['api_url']
 	hydrus_page_name = config['Hydrus']['results_page_name']
+	#hydrus_meta_tags
+	meta_enable_tags = config['Hydrus_Meta_Tags'].getboolean('enable')
+	meta_tag_namespace = config['Hydrus_Meta_Tags']['namespace']
+	meta_tag_hit = config['Hydrus_Meta_Tags']['hit']
+	meta_tag_miss = config['Hydrus_Meta_Tags']['miss']
+	meta_tag_noresult = config['Hydrus_Meta_Tags']['no_result']
+	meta_tag_service = config['Hydrus_Meta_Tags'].get('service', 'my tags')
 	#saucenao
 	saucenao_api_key = config['SauceNao']['api_key']
 	minsim = config['SauceNao']['minsim']
@@ -154,8 +163,23 @@ if not hydrus_api_key  or not saucenao_api_key:
 	sys.exit(5)
 
 hydrus_permissions = [hydrus.Permission.SearchFiles, hydrus.Permission.ImportURLs]
-
-#hydrus_permissions.append(hydrus.Permission.AddTags)
+if meta_enable_tags:
+	hydrus_permissions.append(hydrus.Permission.AddTags)
+	
+	if meta_tag_namespace:
+		if meta_tag_hit:
+			hit_tag = meta_tag_namespace+':'+meta_tag_hit
+		if meta_tag_miss:
+			miss_tag = meta_tag_namespace+':'+meta_tag_miss
+		if meta_tag_noresult:
+			noresult_tag = meta_tag_namespace+':'+meta_tag_noresult
+	else:
+		if meta_tag_hit:
+			hit_tag = meta_tag_hit
+		if meta_tag_miss:
+			miss_tag = meta_tag_miss
+		if meta_tag_noresult:
+			noresult_tag = meta_tag_noresult
 
 
 #generate appropriate bitmask
@@ -224,14 +248,17 @@ for line in hash_input:
 			if results:
 				if results[0].similarity > float(minsim.strip('!')):
 					print('hit! '+str(results[0].similarity), flush=True)
-					#client.add_tags(hashes=line.splitlines(), service_to_tags={"my tags": ['hydrausnao:hit']})
+					if meta_enable_tags and meta_tag_hit:
+						client.add_tags(hashes=line.splitlines(), service_to_tags={meta_tag_service: [hit_tag]})
 					client.add_url(url=results[0].urls[0], page_name=hydrus_page_name)
 				else:
 					print('miss... '+str(results[0].similarity), flush=True)
-					#client.add_tags(hashes=line.splitlines(), service_to_tags={"my tags": ['hydrausnao:miss']})
+					if meta_enable_tags and meta_tag_miss:
+						client.add_tags(hashes=line.splitlines(), service_to_tags={meta_tag_service: [miss_tag]})
 			else:
 				print('no results... ;_;', flush=True)
-				#client.add_tags(hashes=line.splitlines(), service_to_tags={"my tags": ['hydrausnao:miss']})
+				if meta_enable_tags and meta_tag_noresult:
+					client.add_tags(hashes=line.splitlines(), service_to_tags={meta_tag_service: [noresult_tag]})
 			if results.short_remaining < 1:
 				short_pause = True
 			print("")
