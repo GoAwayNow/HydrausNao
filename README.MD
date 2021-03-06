@@ -9,7 +9,7 @@ A script to automatically search SauceNao for images and send results to Hydrus 
 * Hydrus-API `pip install -U hydrus-api`
 
 ## Use
-1. In your Hydrus Client, the Client API must be enabled, and a key with the permissions "Add URLs" and "Search Files" must be created
+1. In your Hydrus Client, the Client API must be enabled, and a key with the permissions "Add URLs", "Search Files" and "Add Tags" must be created. "Add Tags" is not necessary if tagging is disabled in config.ini.
 2. On SauceNAO, create or login to a user account and navigate to the [search api page](https://saucenao.com/user.php?page=search-api)
 3. Run the script once to generate a default config.ini
 4. Edit config.ini, adding  your relevant API keys to the Hydrus and SauceNao sections, and making other changes as necessary
