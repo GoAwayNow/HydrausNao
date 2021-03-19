@@ -35,7 +35,7 @@ except FileNotFoundError:
 	print("config_default.ini not found!\nGenerating default configuration...")
 	config["General"] = {"hash_file": "hashes.txt"}
 	config["Hydrus"] = {"api_key": "", "api_url": "http://127.0.0.1:45869/", "results_Page_Name": "HydrausNao"}
-	config["Hydrus_Meta_Tags"] = {"enable": "1", "namespace": "hydrausnao", "hit": "hit", "miss": "miss", "no_result": "no_result"}
+	config["Hydrus_Meta_Tags"] = {"enable": "1", "namespace": "hydrausnao", "hit": "hit", "miss": "miss", "no_result": "no_result", "service": "my tags"}
 	config["SauceNao"] = {"api_key": "", "minsim": "80!"}
 	config["SauceNao_Indexes"] = {"hmags": "0",
 		"imdb": "0",
@@ -94,7 +94,7 @@ finally:
 	meta_tag_hit = config['Hydrus_Meta_Tags']['hit']
 	meta_tag_miss = config['Hydrus_Meta_Tags']['miss']
 	meta_tag_noresult = config['Hydrus_Meta_Tags']['no_result']
-	meta_tag_service = config['Hydrus_Meta_Tags'].get('service', 'my tags')
+	meta_tag_service = config['Hydrus_Meta_Tags']['service']
 	#saucenao
 	saucenao_api_key = config['SauceNao']['api_key']
 	minsim = config['SauceNao']['minsim']
