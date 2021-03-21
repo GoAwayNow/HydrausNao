@@ -14,17 +14,14 @@
 #THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 
 import sys
-import os
-import io
 import unicodedata
 import requests
 import hydrus
 import hydrus.utils
-from saucenao_api import SauceNao, errors
+from saucenao_api import SauceNao, errors as SauceNaoErrors
 import codecs
 import time
 import configparser
-from collections import OrderedDict
 sys.stdout = codecs.getwriter('utf8')(sys.stdout.detach())
 sys.stderr = codecs.getwriter('utf8')(sys.stderr.detach())
 
@@ -238,19 +235,19 @@ for line in hash_input:
 	while True:
 		try:
 			results = sauce.from_file(thumbnail.content)
-		except errors.ShortLimitReachedError as e:
+		except SauceNaoErrors.ShortLimitReachedError as e:
 			print(str(e)+". Retrying in 2 minutes...", flush=True)
 			time.sleep(2*60)
 			continue
-		except errors.LongLimitReachedError as e:
+		except SauceNaoErrors.LongLimitReachedError as e:
 			print(str(e)+". Retrying in 24 hours...", flush=True)
 			time.sleep(24*60*60)
 			continue
-		except errors.UnknownClientError as e:
+		except SauceNaoErrors.UnknownClientError as e:
 			sys.exit(str(e))
-		except errors.UnknownServerError as e:
+		except SauceNaoErrors.UnknownServerError as e:
 			sys.exit(str(e))
-		except errors.UnknownApiError as e:
+		except SauceNaoErrors.UnknownApiError as e:
 			if retries < 4:
 				print(str(e)+". Retrying in 10 minutes...", flush=True)
 				retries += 1
@@ -258,7 +255,7 @@ for line in hash_input:
 				continue
 			else:
 				sys.exit(str(e)+". Maximum reties reached.")
-		except errors.BadFileSizeError as e:
+		except SauceNaoErrors.BadFileSizeError as e:
 			print(str(e)+". This should be impossible./nTry regenerating the thumbnail for this file. Skipping...", flush=True)
 			time.sleep(10)
 			break
