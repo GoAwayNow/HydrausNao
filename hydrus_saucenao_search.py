@@ -36,7 +36,7 @@ except FileNotFoundError:
 	config["General"] = {"hash_file": "hashes.txt"}
 	config["Hydrus"] = {"api_key": "", "api_url": "http://127.0.0.1:45869/", "results_Page_Name": "HydrausNao"}
 	config["Hydrus_Meta_Tags"] = {"enable": "1", "namespace": "hydrausnao", "hit": "hit", "miss": "miss", "no_result": "no_result"}
-	config["SauceNao"] = {"api_key": "", "minsim": "80!"}
+	config["SauceNao"] = {"api_key": "", "minsim": "80!", "numres": "2"}
 	config["SauceNao_Indexes"] = {"hmags": "0",
 		"imdb": "0",
 		"hcg": "0",
@@ -98,6 +98,7 @@ finally:
 	#saucenao
 	saucenao_api_key = config['SauceNao']['api_key']
 	minsim = config['SauceNao']['minsim']
+	sauce_numres = config['SauceNao'].getint('numres')
 	#saucenao_indexes
 	index_hmags = config['SauceNao_Indexes']['hmags']
 	index_imdb = config['SauceNao_Indexes']['imdb']
@@ -191,7 +192,7 @@ def printe(line):
 	
 sauce = SauceNao(api_key=saucenao_api_key,
 				dbmask=db_bitmask,
-				numres=1,
+				numres=sauce_numres,
 )
 	
 client = hydrus.Client(hydrus_api_key, hydrus_api_url)
@@ -205,6 +206,23 @@ else:
 	if not hydrus.utils.verify_permissions(client, hydrus_permissions):
 		print("The Hydrus API key does not grant all required permissions:", hydrus_permissions)
 		sys.exit(1)
+		
+def handle_results(results):
+	for i in results:
+		if i.similarity > float(minsim.strip('!')):
+			for k in i.urls:
+				r = requests.get(k)
+				if r.status_code == 200:
+					print('hit! '+str(i.similarity), flush=True)
+					if meta_enable_tags and meta_tag_hit:
+						client.add_tags(hashes=line.splitlines(), service_to_tags={meta_tag_service: [hit_tag]})
+					client.add_url(url=k, page_name=hydrus_page_name)
+					return
+	else:
+		print('miss... '+str(results[0].similarity), flush=True)
+		if meta_enable_tags and meta_tag_miss:
+			client.add_tags(hashes=line.splitlines(), service_to_tags={meta_tag_service: [miss_tag]})
+		return
 
 short_pause = False
 
@@ -241,20 +259,12 @@ for line in hash_input:
 			else:
 				sys.exit(str(e)+". Maximum reties reached.")
 		except errors.BadFileSizeError as e:
-			print(str(e)+". This should be impossible. Skipping...", flush=True)
+			print(str(e)+". This should be impossible./nTry regenerating the thumbnail for this file. Skipping...", flush=True)
 			time.sleep(10)
 			break
 		else:
 			if results:
-				if results[0].similarity > float(minsim.strip('!')):
-					print('hit! '+str(results[0].similarity), flush=True)
-					if meta_enable_tags and meta_tag_hit:
-						client.add_tags(hashes=line.splitlines(), service_to_tags={meta_tag_service: [hit_tag]})
-					client.add_url(url=results[0].urls[0], page_name=hydrus_page_name)
-				else:
-					print('miss... '+str(results[0].similarity), flush=True)
-					if meta_enable_tags and meta_tag_miss:
-						client.add_tags(hashes=line.splitlines(), service_to_tags={meta_tag_service: [miss_tag]})
+				handle_results(results)
 			else:
 				print('no results... ;_;', flush=True)
 				if meta_enable_tags and meta_tag_noresult:
