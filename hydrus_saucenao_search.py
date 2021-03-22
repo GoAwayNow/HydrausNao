@@ -212,6 +212,21 @@ else:
 		print("The Hydrus API key does not grant all required permissions:", hydrus_permissions)
 		sys.exit(1)
 		
+def tag_file(status):
+	if not meta_enable_tags:
+		return
+	
+	if status == "hit" and meta_tag_hit:
+		final_tag = hit_tag
+	elif status == "miss" and meta_tag_miss:
+		final_tag = miss_tag
+	elif status == "noresult" and meta_tag_noresult:
+		final_tag = noresult_tag
+	else:
+		return
+	
+	client.add_tags(hashes=line.splitlines(), service_to_tags={meta_tag_service: [final_tag]})
+		
 def handle_results(results):
 	if verbose_output:
 		resultnum = 0
@@ -226,14 +241,12 @@ def handle_results(results):
 					print('Processing URL:'+k+'\nResponse code:'+str(r.status_code))
 				if r.status_code == 200:
 					print('hit! '+str(i.similarity), flush=True)
-					if meta_enable_tags and meta_tag_hit:
-						client.add_tags(hashes=line.splitlines(), service_to_tags={meta_tag_service: [hit_tag]})
+					tag_file("hit")
 					client.add_url(url=k, page_name=hydrus_page_name)
 					return
 	else:
 		print('miss... '+str(results[0].similarity), flush=True)
-		if meta_enable_tags and meta_tag_miss:
-			client.add_tags(hashes=line.splitlines(), service_to_tags={meta_tag_service: [miss_tag]})
+		tag_file("miss")
 		return
 
 short_pause = False
@@ -271,7 +284,7 @@ for line in hash_input:
 			else:
 				sys.exit(str(e)+". Maximum reties reached.")
 		except SauceNaoErrors.BadFileSizeError as e:
-			print(str(e)+". This should be impossible./nTry regenerating the thumbnail for this file. Skipping...", flush=True)
+			print(str(e)+". This should be impossible.\nTry regenerating the thumbnail for this file. Skipping...", flush=True)
 			time.sleep(10)
 			break
 		else:
@@ -279,8 +292,7 @@ for line in hash_input:
 				handle_results(results)
 			else:
 				print('no results... ;_;', flush=True)
-				if meta_enable_tags and meta_tag_noresult:
-					client.add_tags(hashes=line.splitlines(), service_to_tags={meta_tag_service: [noresult_tag]})
+				tag_file("noresult")
 			if results.short_remaining < 1:
 				short_pause = True
 			print("")
