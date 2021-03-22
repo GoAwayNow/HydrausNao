@@ -14,16 +14,15 @@
 #THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 
 import sys
-import unicodedata
 import requests
 import hydrus
 import hydrus.utils
 from saucenao_api import SauceNao, errors as SauceNaoErrors
-import codecs
+#import codecs
 import time
 import configparser
-sys.stdout = codecs.getwriter('utf8')(sys.stdout.detach())
-sys.stderr = codecs.getwriter('utf8')(sys.stderr.detach())
+#sys.stdout = codecs.getwriter('utf8')(sys.stdout.detach())
+#sys.stderr = codecs.getwriter('utf8')(sys.stderr.detach())
 
 config = configparser.ConfigParser()
 try:
@@ -81,6 +80,7 @@ finally:
 	config.read('config.ini')
 	#general
 	hash_file = config['General']['hash_file']
+	verbose_output = config['General'].getboolean('verbose', False)
 	#hydrus
 	hydrus_api_key = config['Hydrus']['api_key']
 	hydrus_api_url = config['Hydrus']['api_url']
@@ -182,7 +182,7 @@ if meta_enable_tags:
 
 #generate appropriate bitmask
 db_bitmask = int(index_furnet+index_twitter+index_fa+index_artstation+index_ehentai+index_mangadex+index_madokami+index_pawoo+index_da+index_portalgraphics+index_bcycosplay+index_bcyillust+index_idolcomplex+index_e621+index_animepictures+index_sankaku+index_konachan+index_gelbooru+index_shows+index_movies+index_hanime+index_anime+index_medibang+index_2dmarket+index_hmisc+index_fakku+index_shutterstock+index_imdb+index_animeop+index_yandere+index_nijie+index_drawr+index_danbooru+index_seigaillust+index_anime+index_pixivhistorical+index_pixiv+index_ddbsamples+index_ddbobjects+index_hcg+index_hanime+index_hmags,2)
-print("dbmask="+str(db_bitmask))
+#print("dbmask="+str(db_bitmask))
 #encoded print - handle random crap
 def printe(line):
     print(str(line).encode(sys.getdefaultencoding(), 'replace')) #ignore or replace
@@ -193,6 +193,14 @@ sauce = SauceNao(api_key=saucenao_api_key,
 )
 	
 client = hydrus.Client(hydrus_api_key, hydrus_api_url)
+
+r_head = requests.utils.default_headers()
+
+r_head.update(
+    {
+        'User-Agent': 'HydrausNao/Git by GanBat',
+    }
+)
 
 try:
 	p = hydrus.utils.verify_permissions(client, hydrus_permissions)
@@ -205,10 +213,17 @@ else:
 		sys.exit(1)
 		
 def handle_results(results):
+	if verbose_output:
+		resultnum = 0
 	for i in results:
+		if verbose_output:
+			resultnum += 1
+			print('Trying result #'+str(resultnum)+'\nSimilarity:'+str(i.similarity))
 		if i.similarity > float(minsim.strip('!')):
 			for k in i.urls:
-				r = requests.get(k)
+				r = requests.get(k, headers=r_head)
+				if verbose_output:
+					print('Processing URL:'+k+'\nResponse code:'+str(r.status_code))
 				if r.status_code == 200:
 					print('hit! '+str(i.similarity), flush=True)
 					if meta_enable_tags and meta_tag_hit:
