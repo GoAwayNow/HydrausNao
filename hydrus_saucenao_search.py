@@ -225,7 +225,16 @@ def tag_file(status):
 	else:
 		return
 	
-	client.add_tags(hashes=line.splitlines(), service_to_tags={meta_tag_service: [final_tag]})
+	try:
+		client.add_tags(hashes=line.splitlines(), service_to_tags={meta_tag_service: [final_tag]})
+	except hydrus.MissingParameter as e:
+		print(str(e))
+		print("A different tag service can be set in config.ini.\n"
+			"Add a key called service to the Hydrus_Meta_Tags section and\nset it to the name of your tag service.\n\n"
+			"Example:\n[Hydrus_Meta_Tags]\nservice = my tag service")
+		sys.exit(e)
+	else:
+		return
 		
 def handle_results(results):
 	if verbose_output:
