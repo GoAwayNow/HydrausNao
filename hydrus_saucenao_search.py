@@ -31,7 +31,7 @@ except FileNotFoundError:
 	print("config_default.ini not found!\nGenerating default configuration...")
 	config["General"] = {"hash_file": "hashes.txt"}
 	config["Hydrus"] = {"api_key": "", "api_url": "http://127.0.0.1:45869/", "results_Page_Name": "HydrausNao"}
-	config["Hydrus_Meta_Tags"] = {"enable": "1", "namespace": "hydrausnao", "hit": "hit", "miss": "miss", "no_result": "no_result"}
+	config["Hydrus_Meta_Tags"] = {"enable": "1", "namespace": "hydrausnao", "hit": "hit", "miss": "miss", "miss_over_minsim": "miss over minsim", "no_result": "no_result"}
 	config["SauceNao"] = {"api_key": "", "minsim": "80!", "numres": "2"}
 	config["SauceNao_Indexes"] = {"hmags": "0",
 		"imdb": "0",
@@ -90,6 +90,7 @@ finally:
 	meta_tag_namespace = config['Hydrus_Meta_Tags']['namespace']
 	meta_tag_hit = config['Hydrus_Meta_Tags']['hit']
 	meta_tag_miss = config['Hydrus_Meta_Tags']['miss']
+	meta_tag_mom = config['Hydrus_Meta_Tags']['miss_over_minsim']
 	meta_tag_noresult = config['Hydrus_Meta_Tags']['no_result']
 	meta_tag_service = config['Hydrus_Meta_Tags'].get('service', 'my tags')
 	#saucenao
@@ -169,6 +170,8 @@ if meta_enable_tags:
 			hit_tag = meta_tag_namespace+':'+meta_tag_hit
 		if meta_tag_miss:
 			miss_tag = meta_tag_namespace+':'+meta_tag_miss
+		if meta_tag_mom:
+			missovermin_tag = meta_tag_namespace+':'+meta_tag_mom
 		if meta_tag_noresult:
 			noresult_tag = meta_tag_namespace+':'+meta_tag_noresult
 	else:
@@ -176,6 +179,8 @@ if meta_enable_tags:
 			hit_tag = meta_tag_hit
 		if meta_tag_miss:
 			miss_tag = meta_tag_miss
+		if meta_tag_mom:
+			missovermin_tag = meta_tag_mom
 		if meta_tag_noresult:
 			noresult_tag = meta_tag_noresult
 
@@ -220,6 +225,11 @@ def tag_file(status):
 		final_tag = hit_tag
 	elif status == "miss" and meta_tag_miss:
 		final_tag = miss_tag
+	elif status == "miss_over_min":
+		if meta_tag_mom:
+			final_tag = missovermin_tag
+		elif meta_tag_miss:
+			final_tag = miss_tag
 	elif status == "noresult" and meta_tag_noresult:
 		final_tag = noresult_tag
 	else:
@@ -255,7 +265,10 @@ def handle_results(results):
 					return
 	else:
 		print('miss... '+str(results[0].similarity), flush=True)
-		tag_file("miss")
+		if results[0].similarity > float(minsim.strip('!')):
+			tag_file("miss_over_min")
+		else:
+			tag_file("miss")
 		return
 
 short_pause = False
