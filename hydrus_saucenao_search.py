@@ -24,6 +24,8 @@ import configparser
 #sys.stdout = codecs.getwriter('utf8')(sys.stdout.detach())
 #sys.stderr = codecs.getwriter('utf8')(sys.stderr.detach())
 
+results = None
+
 config = configparser.ConfigParser()
 try:
 	config.read_file(open("config_default.ini"))
@@ -276,7 +278,10 @@ short_pause = False
 for line in hash_input:
 	if short_pause:
 		print('Out of searches for this 30 second period. Sleeping for 30 seconds...', flush=True)
+		if results:
+			print(str(results.long_remaining)+' searches remaining today.', flush=True)
 		time.sleep(30)
+		print("")
 	short_pause = False
 	thumbnail = client.get_thumbnail(hash_=line)
 	print("Processing hash: "+str(line).rstrip(), flush=True)
