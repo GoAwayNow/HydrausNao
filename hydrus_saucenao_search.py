@@ -301,7 +301,16 @@ for line in hash_input:
 		except SauceNaoErrors.UnknownClientError as e:
 			sys.exit(str(e))
 		except SauceNaoErrors.UnknownServerError as e:
-			sys.exit(str(e))
+			if str(e) == 'Unknown API error, status > 0':
+				if retries < 4:
+					print(str(e)+". Retrying in 10 minutes...", flush=True)
+					retries += 1
+					time.sleep(600)
+					continue
+				else:
+					sys.exit(str(e)+". Maximum reties reached.")
+			else:
+				sys.exit(str(e))
 		except SauceNaoErrors.UnknownApiError as e:
 			if retries < 4:
 				print(str(e)+". Retrying in 10 minutes...", flush=True)
