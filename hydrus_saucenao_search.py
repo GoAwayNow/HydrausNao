@@ -73,7 +73,7 @@ except FileNotFoundError:
 		"ehentai": "0",
 		"artstation": "0",
 		"furaffinity": "0",
-		"twitter": "1",
+		"twitter": "0",
 		"furrynetwork": "0"}
 	with open("config_default.ini", "w") as defconfigfile:
 		config.write(defconfigfile)
