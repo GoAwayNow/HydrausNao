@@ -31,7 +31,7 @@ try:
 	config.read_file(open("config_default.ini"))
 except FileNotFoundError:
 	print("config_default.ini not found!\nGenerating default configuration...")
-	config["General"] = {"hash_file": "hashes.txt"}
+	config["General"] = {"hash_file": "hashes.txt", "test_results": "1"}
 	config["Hydrus"] = {"api_key": "", "api_url": "http://127.0.0.1:45869/", "results_Page_Name": "HydrausNao"}
 	config["Hydrus_Meta_Tags"] = {"enable": "1", "namespace": "hydrausnao", "hit": "hit", "miss": "miss", "miss_over_minsim": "miss over minsim", "no_result": "no_result"}
 	config["SauceNao"] = {"api_key": "", "minsim": "80!", "numres": "2"}
@@ -83,6 +83,7 @@ finally:
 	#general
 	hash_file = config['General']['hash_file']
 	verbose_output = config['General'].getboolean('verbose', False)
+	gen_test_res = config['General'].getboolean('test_results')
 	#hydrus
 	hydrus_api_key = config['Hydrus']['api_key']
 	hydrus_api_url = config['Hydrus']['api_url']
@@ -249,6 +250,14 @@ def tag_file(status):
 		return
 		
 def handle_results(results):
+	if not gen_test_res:
+		if results[0].similarity > float(minsim.strip('!')):
+			print('hit! '+str(results[0].similarity), flush=True)
+			tag_file("hit")
+			client.add_url(url=results[0].urls[0], page_name=hydrus_page_name)
+		else:
+			tag_file("miss")
+		return
 	if verbose_output:
 		resultnum = 0
 	for i in results:
