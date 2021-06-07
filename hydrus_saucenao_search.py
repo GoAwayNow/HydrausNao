@@ -190,7 +190,8 @@ if meta_enable_tags:
 
 #generate appropriate bitmask
 db_bitmask = int(index_furnet+index_twitter+index_fa+index_artstation+index_ehentai+index_mangadex+index_madokami+index_pawoo+index_da+index_portalgraphics+index_bcycosplay+index_bcyillust+index_idolcomplex+index_e621+index_animepictures+index_sankaku+index_konachan+index_gelbooru+index_shows+index_movies+index_hanime+index_anime+index_medibang+index_2dmarket+index_hmisc+index_fakku+index_shutterstock+index_imdb+index_animeop+index_yandere+index_nijie+index_drawr+index_danbooru+index_seigaillust+index_anime+index_pixivhistorical+index_pixiv+index_ddbsamples+index_ddbobjects+index_hcg+index_hanime+index_hmags,2)
-#print("dbmask="+str(db_bitmask))
+if verbose_output:
+    print("dbmask="+str(db_bitmask))
 #encoded print - handle random crap
 def printe(line):
     print(str(line).encode(sys.getdefaultencoding(), 'replace')) #ignore or replace
