@@ -102,46 +102,46 @@ finally:
     minsim = config['SauceNao']['minsim']
     sauce_numres = config['SauceNao'].getint('numres')
     #saucenao_indexes
-    index_hmags = config['SauceNao_Indexes']['hmags']
-    index_imdb = config['SauceNao_Indexes']['imdb']
-    index_hcg = config['SauceNao_Indexes']['hcg']
-    index_ddbobjects = config['SauceNao_Indexes']['ddbobjects']
-    index_ddbsamples = config['SauceNao_Indexes']['ddbsamples']
-    index_pixiv = config['SauceNao_Indexes']['pixiv']
-    index_pixivhistorical = config['SauceNao_Indexes']['pixivhistorical']
-    index_seigaillust = config['SauceNao_Indexes']['seigaillust']
-    index_danbooru = config['SauceNao_Indexes']['danbooru']
-    index_drawr = config['SauceNao_Indexes']['drawr']
-    index_nijie = config['SauceNao_Indexes']['nijie']
-    index_yandere = config['SauceNao_Indexes']['yandere']
-    index_animeop = config['SauceNao_Indexes']['animeop']
-    index_shutterstock = config['SauceNao_Indexes']['shutterstock']
-    index_fakku = config['SauceNao_Indexes']['fakku']
-    index_hmisc = config['SauceNao_Indexes']['nhentai']
-    index_2dmarket = config['SauceNao_Indexes']['2dmarket']
-    index_medibang = config['SauceNao_Indexes']['medibang']
-    index_anime = config['SauceNao_Indexes']['anime']
-    index_hanime = config['SauceNao_Indexes']['hanime']
-    index_movies = config['SauceNao_Indexes']['movies']
-    index_shows = config['SauceNao_Indexes']['shows']
-    index_gelbooru = config['SauceNao_Indexes']['gelbooru']
-    index_konachan = config['SauceNao_Indexes']['konachan']
-    index_sankaku = config['SauceNao_Indexes']['sankaku']
-    index_animepictures = config['SauceNao_Indexes']['animepictures']
-    index_e621 = config['SauceNao_Indexes']['e621']
-    index_idolcomplex = config['SauceNao_Indexes']['idolcomplex']
-    index_bcyillust = config['SauceNao_Indexes']['bcyillust']
-    index_bcycosplay = config['SauceNao_Indexes']['bcycosplay']
-    index_portalgraphics = config['SauceNao_Indexes']['portalgraphics']
-    index_da = config['SauceNao_Indexes']['da']
-    index_pawoo = config['SauceNao_Indexes']['pawoo']
-    index_madokami = config['SauceNao_Indexes']['madokami']
-    index_mangadex = config['SauceNao_Indexes']['mangadex']
-    index_ehentai = config['SauceNao_Indexes']['ehentai']
-    index_artstation = config['SauceNao_Indexes']['artstation']
-    index_fa = config['SauceNao_Indexes']['furaffinity']
-    index_twitter = config['SauceNao_Indexes']['twitter']
-    index_furnet = config['SauceNao_Indexes']['furrynetwork']
+    index_hmags = config['SauceNao_Indexes'].getboolean('hmags')
+    index_imdb = config['SauceNao_Indexes'].getboolean('imdb')
+    index_hcg = config['SauceNao_Indexes'].getboolean('hcg')
+    index_ddbobjects = config['SauceNao_Indexes'].getboolean('ddbobjects')
+    index_ddbsamples = config['SauceNao_Indexes'].getboolean('ddbsamples')
+    index_pixiv = config['SauceNao_Indexes'].getboolean('pixiv')
+    index_pixivhistorical = config['SauceNao_Indexes'].getboolean('pixivhistorical')
+    index_seigaillust = config['SauceNao_Indexes'].getboolean('seigaillust')
+    index_danbooru = config['SauceNao_Indexes'].getboolean('danbooru')
+    index_drawr = config['SauceNao_Indexes'].getboolean('drawr')
+    index_nijie = config['SauceNao_Indexes'].getboolean('nijie')
+    index_yandere = config['SauceNao_Indexes'].getboolean('yandere')
+    index_animeop = config['SauceNao_Indexes'].getboolean('animeop')
+    index_shutterstock = config['SauceNao_Indexes'].getboolean('shutterstock')
+    index_fakku = config['SauceNao_Indexes'].getboolean('fakku')
+    index_hmisc = config['SauceNao_Indexes'].getboolean('nhentai')
+    index_2dmarket = config['SauceNao_Indexes'].getboolean('2dmarket')
+    index_medibang = config['SauceNao_Indexes'].getboolean('medibang')
+    index_anime = config['SauceNao_Indexes'].getboolean('anime')
+    index_hanime = config['SauceNao_Indexes'].getboolean('hanime')
+    index_movies = config['SauceNao_Indexes'].getboolean('movies')
+    index_shows = config['SauceNao_Indexes'].getboolean('shows')
+    index_gelbooru = config['SauceNao_Indexes'].getboolean('gelbooru')
+    index_konachan = config['SauceNao_Indexes'].getboolean('konachan')
+    index_sankaku = config['SauceNao_Indexes'].getboolean('sankaku')
+    index_animepictures = config['SauceNao_Indexes'].getboolean('animepictures')
+    index_e621 = config['SauceNao_Indexes'].getboolean('e621')
+    index_idolcomplex = config['SauceNao_Indexes'].getboolean('idolcomplex')
+    index_bcyillust = config['SauceNao_Indexes'].getboolean('bcyillust')
+    index_bcycosplay = config['SauceNao_Indexes'].getboolean('bcycosplay')
+    index_portalgraphics = config['SauceNao_Indexes'].getboolean('portalgraphics')
+    index_da = config['SauceNao_Indexes'].getboolean('da')
+    index_pawoo = config['SauceNao_Indexes'].getboolean('pawoo')
+    index_madokami = config['SauceNao_Indexes'].getboolean('madokami')
+    index_mangadex = config['SauceNao_Indexes'].getboolean('mangadex')
+    index_ehentai = config['SauceNao_Indexes'].getboolean('ehentai')
+    index_artstation = config['SauceNao_Indexes'].getboolean('artstation')
+    index_fa = config['SauceNao_Indexes'].getboolean('furaffinity')
+    index_twitter = config['SauceNao_Indexes'].getboolean('twitter')
+    index_furnet = config['SauceNao_Indexes'].getboolean('furrynetwork')
 
 try:
     hash_input = open(hash_file)
@@ -190,7 +190,9 @@ if meta_enable_tags:
 
 
 #generate appropriate bitmask
-db_bitmask = int(index_furnet+index_twitter+index_fa+index_artstation+index_ehentai+index_mangadex+index_madokami+index_pawoo+index_da+index_portalgraphics+index_bcycosplay+index_bcyillust+index_idolcomplex+index_e621+index_animepictures+index_sankaku+index_konachan+index_gelbooru+index_shows+index_movies+index_hanime+index_anime+index_medibang+index_2dmarket+index_hmisc+index_fakku+index_shutterstock+index_imdb+index_animeop+index_yandere+index_nijie+index_drawr+index_danbooru+index_seigaillust+index_anime+index_pixivhistorical+index_pixiv+index_ddbsamples+index_ddbobjects+index_hcg+index_hanime+index_hmags,2)
+def bis(boolin):
+	return str(int(boolin))
+db_bitmask = int(bis(index_furnet)+bis(index_twitter)+bis(index_fa)+bis(index_artstation)+bis(index_ehentai)+bis(index_mangadex)+bis(index_madokami)+bis(index_pawoo)+bis(index_da)+bis(index_portalgraphics)+bis(index_bcycosplay)+bis(index_bcyillust)+bis(index_idolcomplex)+bis(index_e621)+bis(index_animepictures)+bis(index_sankaku)+bis(index_konachan)+bis(index_gelbooru)+bis(index_shows)+bis(index_movies)+bis(index_hanime)+bis(index_anime)+bis(index_medibang)+bis(index_2dmarket)+bis(index_hmisc)+bis(index_fakku)+bis(index_shutterstock)+bis(index_imdb)+bis(index_animeop)+bis(index_yandere)+bis(index_nijie)+bis(index_drawr)+bis(index_danbooru)+bis(index_seigaillust)+bis(index_anime)+bis(index_pixivhistorical)+bis(index_pixiv)+bis(index_ddbsamples)+bis(index_ddbobjects)+bis(index_hcg)+bis(index_hanime)+bis(index_hmags),2)
 if verbose_output:
     print("dbmask="+str(db_bitmask))
 #encoded print - handle random crap
