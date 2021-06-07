@@ -77,6 +77,7 @@ except FileNotFoundError:
         "furrynetwork": "0"}
     with open("config_default.ini", "w") as defconfigfile:
         config.write(defconfigfile)
+        defconfigfile.close()
     #print("Please edit config.ini before running this script again.")
 finally:
     config.read('config.ini')
