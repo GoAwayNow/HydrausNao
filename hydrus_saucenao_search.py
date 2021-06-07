@@ -54,7 +54,7 @@ except FileNotFoundError:
         "shows": "0",
         "gelbooru": "1",
         "konachan": "1",
-        "sankaku": "1",
+        "sankaku": "0",
         "animepictures": "0",
         "e621": "1",
         "idolcomplex": "0",
