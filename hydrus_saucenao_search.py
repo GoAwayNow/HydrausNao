@@ -36,10 +36,7 @@ except FileNotFoundError:
     config["Hydrus_Meta_Tags"] = {"enable": "1", "namespace": "hydrausnao", "hit": "hit", "miss": "miss", "miss_over_minsim": "miss over minsim", "no_result": "no_result"}
     config["SauceNao"] = {"api_key": "", "minsim": "80!", "numres": "2"}
     config["SauceNao_Indexes"] = {"hmags": "0",
-        "imdb": "0",
         "hcg": "0",
-        "ddbobjects": "0",
-        "ddbsamples": "0",
         "pixiv": "1",
         "pixivhistorical": "0",
         "seigaillust": "0",
@@ -47,8 +44,6 @@ except FileNotFoundError:
         "drawr": "0",
         "nijie": "1",
         "yandere": "1",
-        "animeop": "0",
-        "shutterstock": "0",
         "fakku": "0",
         "nhentai": "0",
         "2dmarket": "0",
@@ -103,10 +98,10 @@ finally:
     sauce_numres = config['SauceNao'].getint('numres')
     #saucenao_indexes
     index_hmags = config['SauceNao_Indexes'].getboolean('hmags')
-    index_imdb = config['SauceNao_Indexes'].getboolean('imdb')
+    index_imdb = config['SauceNao_Indexes'].getboolean('imdb', False)
     index_hcg = config['SauceNao_Indexes'].getboolean('hcg')
-    index_ddbobjects = config['SauceNao_Indexes'].getboolean('ddbobjects')
-    index_ddbsamples = config['SauceNao_Indexes'].getboolean('ddbsamples')
+    index_ddbobjects = config['SauceNao_Indexes'].getboolean('ddbobjects', False)
+    index_ddbsamples = config['SauceNao_Indexes'].getboolean('ddbsamples', False)
     index_pixiv = config['SauceNao_Indexes'].getboolean('pixiv')
     index_pixivhistorical = config['SauceNao_Indexes'].getboolean('pixivhistorical')
     index_seigaillust = config['SauceNao_Indexes'].getboolean('seigaillust')
@@ -114,8 +109,8 @@ finally:
     index_drawr = config['SauceNao_Indexes'].getboolean('drawr')
     index_nijie = config['SauceNao_Indexes'].getboolean('nijie')
     index_yandere = config['SauceNao_Indexes'].getboolean('yandere')
-    index_animeop = config['SauceNao_Indexes'].getboolean('animeop')
-    index_shutterstock = config['SauceNao_Indexes'].getboolean('shutterstock')
+    index_animeop = config['SauceNao_Indexes'].getboolean('animeop', False)
+    index_shutterstock = config['SauceNao_Indexes'].getboolean('shutterstock', False)
     index_fakku = config['SauceNao_Indexes'].getboolean('fakku')
     index_hmisc = config['SauceNao_Indexes'].getboolean('nhentai')
     index_2dmarket = config['SauceNao_Indexes'].getboolean('2dmarket')
