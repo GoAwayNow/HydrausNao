@@ -98,46 +98,6 @@ finally:
     sauce_numres = config['SauceNao'].getint('numres')
     #saucenao_indexes
     saucenao_indexes = config['SauceNao_Indexes']
-    index_hmags = saucenao_indexes.getboolean('hmags')
-    index_imdb = saucenao_indexes.getboolean('imdb', False)
-    index_hcg = saucenao_indexes.getboolean('hcg')
-    index_ddbobjects = saucenao_indexes.getboolean('ddbobjects', False)
-    index_ddbsamples = saucenao_indexes.getboolean('ddbsamples', False)
-    index_pixiv = saucenao_indexes.getboolean('pixiv')
-    index_pixivhistorical = saucenao_indexes.getboolean('pixivhistorical')
-    index_seigaillust = saucenao_indexes.getboolean('seigaillust')
-    index_danbooru = saucenao_indexes.getboolean('danbooru')
-    index_drawr = saucenao_indexes.getboolean('drawr')
-    index_nijie = saucenao_indexes.getboolean('nijie')
-    index_yandere = saucenao_indexes.getboolean('yandere')
-    index_animeop = saucenao_indexes.getboolean('animeop', False)
-    index_shutterstock = saucenao_indexes.getboolean('shutterstock', False)
-    index_fakku = saucenao_indexes.getboolean('fakku')
-    index_hmisc = saucenao_indexes.getboolean('nhentai')
-    index_2dmarket = saucenao_indexes.getboolean('2dmarket')
-    index_medibang = saucenao_indexes.getboolean('medibang')
-    index_anime = saucenao_indexes.getboolean('anime')
-    index_hanime = saucenao_indexes.getboolean('hanime')
-    index_movies = saucenao_indexes.getboolean('movies')
-    index_shows = saucenao_indexes.getboolean('shows')
-    index_gelbooru = saucenao_indexes.getboolean('gelbooru')
-    index_konachan = saucenao_indexes.getboolean('konachan')
-    index_sankaku = saucenao_indexes.getboolean('sankaku')
-    index_animepictures = saucenao_indexes.getboolean('animepictures')
-    index_e621 = saucenao_indexes.getboolean('e621')
-    index_idolcomplex = saucenao_indexes.getboolean('idolcomplex')
-    index_bcyillust = saucenao_indexes.getboolean('bcyillust')
-    index_bcycosplay = saucenao_indexes.getboolean('bcycosplay')
-    index_portalgraphics = saucenao_indexes.getboolean('portalgraphics')
-    index_da = saucenao_indexes.getboolean('da')
-    index_pawoo = saucenao_indexes.getboolean('pawoo')
-    index_madokami = saucenao_indexes.getboolean('madokami')
-    index_mangadex = saucenao_indexes.getboolean('mangadex')
-    index_ehentai = saucenao_indexes.getboolean('ehentai')
-    index_artstation = saucenao_indexes.getboolean('artstation')
-    index_fa = saucenao_indexes.getboolean('furaffinity')
-    index_twitter = saucenao_indexes.getboolean('twitter')
-    index_furnet = saucenao_indexes.getboolean('furrynetwork')
 
 try:
     hash_input = open(hash_file)
@@ -201,7 +161,6 @@ sauce_index_list = ['hmags',
                     'imdb',
                     'shutterstock',
                     'fakku',
-                    'reserved',
                     'nhentai',
                     '2dmarket',
                     'medibang',
@@ -231,7 +190,7 @@ sauce_index_list = ['hmags',
 #generate appropriate bitmask
 def bis(boolin):
 	return str(int(boolin))
-db_bitmask = int(bis(index_furnet)+bis(index_twitter)+bis(index_fa)+bis(index_artstation)+bis(index_ehentai)+bis(index_mangadex)+bis(index_madokami)+bis(index_pawoo)+bis(index_da)+bis(index_portalgraphics)+bis(index_bcycosplay)+bis(index_bcyillust)+bis(index_idolcomplex)+bis(index_e621)+bis(index_animepictures)+bis(index_sankaku)+bis(index_konachan)+bis(index_gelbooru)+bis(index_shows)+bis(index_movies)+bis(index_hanime)+bis(index_anime)+bis(index_medibang)+bis(index_2dmarket)+bis(index_hmisc)+bis(index_fakku)+bis(index_shutterstock)+bis(index_imdb)+bis(index_animeop)+bis(index_yandere)+bis(index_nijie)+bis(index_drawr)+bis(index_danbooru)+bis(index_seigaillust)+bis(index_anime)+bis(index_pixivhistorical)+bis(index_pixiv)+bis(index_ddbsamples)+bis(index_ddbobjects)+bis(index_hcg)+bis(index_hanime)+bis(index_hmags),2)
+db_bitmask = int("".join('1' if saucenao_indexes.getboolean(i, False) else '0' for i in reversed(sauce_index_list)), 2)
 if verbose_output:
     print("dbmask="+str(db_bitmask))
 #encoded print - handle random crap
