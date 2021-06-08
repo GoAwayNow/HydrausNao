@@ -147,6 +147,8 @@ if meta_enable_tags:
         if meta_tag_noresult:
             noresult_tag = meta_tag_noresult
 
+#list indexes match server indexes
+#this is why reserved is included despite not being part of dbmask calcs
 sauce_index_list = ['hmags',
                     'hanime',
                     'hcg',
