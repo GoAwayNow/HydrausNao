@@ -161,6 +161,7 @@ sauce_index_list = ['hmags',
                     'imdb',
                     'shutterstock',
                     'fakku',
+                    'reserved',
                     'nhentai',
                     '2dmarket',
                     'medibang',
@@ -190,7 +191,15 @@ sauce_index_list = ['hmags',
 #generate appropriate bitmask
 def bis(boolin):
 	return str(int(boolin))
-db_bitmask = int("".join('1' if saucenao_indexes.getboolean(i, False) else '0' for i in reversed(sauce_index_list)), 2)
+db_bitmask_bin = ''
+for i in reversed(sauce_index_list):
+	if i == 'reserved':
+		continue
+	if saucenao_indexes.getboolean(i, False):
+		db_bitmask_bin = db_bitmask_bin+'1'
+	else:
+		db_bitmask_bin = db_bitmask_bin+'0'
+db_bitmask = int(db_bitmask_bin, 2)
 if verbose_output:
     print("dbmask="+str(db_bitmask))
 #encoded print - handle random crap
