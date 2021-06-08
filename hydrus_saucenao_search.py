@@ -14,6 +14,9 @@
 #THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 
 import sys
+import os
+import subprocess
+import shutil
 import requests
 import hydrus
 import hydrus.utils
@@ -213,13 +216,21 @@ sauce = SauceNao(api_key=saucenao_api_key,
     
 client = hydrus.Client(hydrus_api_key, hydrus_api_url)
 
+if shutil.which('git') and os.path.exists('.git'):
+    hn_revision = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD']).decode('ascii').strip()
+else:
+    hn_revision = 'Git'
+
 r_head = requests.utils.default_headers()
 
 r_head.update(
     {
-        'User-Agent': 'HydrausNao/Git by GanBat',
+        'User-Agent': 'HydrausNao/'+hn_revision+' by GanBat',
     }
 )
+
+if verbose_output:
+    print('User-Agent:'+str(r_head['User-Agent']))
 
 try:
     p = hydrus.utils.verify_permissions(client, hydrus_permissions)
