@@ -1,3 +1,4 @@
 *.txt
+!blacklist-deviantart.txt
 config.ini
 *.bat

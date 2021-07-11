@@ -34,6 +34,7 @@ try:
     config.read_file(open("config_default.ini"))
 except FileNotFoundError:
     print("config_default.ini not found!\nGenerating default configuration...")
+    config["DEFAULT"] = {"blacklist_file": ""}
     config["General"] = {"hash_file": "hashes.txt", "test_results": "1"}
     config["Hydrus"] = {"api_key": "", "api_url": "http://127.0.0.1:45869/", "results_Page_Name": "HydrausNao"}
     config["Hydrus_Meta_Tags"] = {"enable": "1", "namespace": "hydrausnao", "hit": "hit", "miss": "miss", "miss_over_minsim": "miss over minsim", "no_result": "no_result"}
@@ -193,17 +194,20 @@ sauce_index_list = ['hmags',
                     'twitter',
                     'furrynetwork']
 
-#generate appropriate bitmask
+#generate appropriate bitmask & empty index config sections
 def bis(boolin):
-	return str(int(boolin))
+    return str(int(boolin))
 db_bitmask_bin = ''
 for i in reversed(sauce_index_list):
-	if i == 'reserved':
-		continue
-	if saucenao_indexes.getboolean(i, False):
-		db_bitmask_bin = db_bitmask_bin+'1'
-	else:
-		db_bitmask_bin = db_bitmask_bin+'0'
+    if i == 'reserved':
+        continue
+    if not i in config.keys():
+        config[i] = {}
+    if saucenao_indexes.getboolean(i, False):
+        db_bitmask_bin = db_bitmask_bin+'1'
+    else:
+        db_bitmask_bin = db_bitmask_bin+'0'
+        
 db_bitmask = int(db_bitmask_bin, 2)
 if verbose_output:
     print("dbmask="+str(db_bitmask))
@@ -272,9 +276,26 @@ def tag_file(status):
         sys.exit(e)
     else:
         return
-        
+    
+def test_blacklist(result_author, blacklist):
+    if verbose_output:
+        print('Blacklist file: '+blacklist)
+    f = open(blacklist, 'r')
+    if result_author in f.read():
+        print('miss... blacklisted author: '+result_author)
+        tag_file("miss")
+        f.close()
+        return True
+    else:
+        return False
+      
+#this can be done better, elimate redundancy and stuff
 def handle_results(results):
     if not gen_test_res:
+        f_blacklist = config[sauce_index_list[results[0].index_id]]['blacklist_file']
+        if f_blacklist:
+            if test_blacklist(results[0].author, f_blacklist):
+                return
         if results[0].similarity > float(minsim.strip('!')):
             print('hit! '+str(results[0].similarity), flush=True)
             tag_file("hit")
@@ -289,10 +310,16 @@ def handle_results(results):
             resultnum += 1
             print('Trying result #'+str(resultnum)+'\nSimilarity:'+str(i.similarity))
         if i.similarity > float(minsim.strip('!')):
+            f_blacklist = config[sauce_index_list[i.index_id]]['blacklist_file']
+            if f_blacklist:
+                if test_blacklist(i.author, f_blacklist):
+                    continue
             for k in i.urls:
+                if verbose_output:
+                    print('Processing URL:'+k, flush=True)
                 r = requests.get(k, headers=r_head)
                 if verbose_output:
-                    print('Processing URL:'+k+'\nResponse code:'+str(r.status_code))
+                    print('Response code:'+str(r.status_code), flush=True)
                 if r.status_code == 200:
                     print('hit! '+str(i.similarity), flush=True)
                     tag_file("hit")

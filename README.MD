@@ -20,9 +20,23 @@ A script to automatically search SauceNao for images and send results to Hydrus 
 The script will inform you of the status of its searches as well as your remaining SauceNao API use limits. Any URLs found will automatically be added to Hydrus for download, in a new page called "HydrausNao" (unless changed in config.ini)
 
 ## About config.ini
-By default, the API key options will be the only options in a generated config.ini. Any key found in config_default.ini can be copied into config.iniin order to override the default values.
+By default, the API key options will be the only options in a generated config.ini. Any key found in config_default.ini can be copied into config.ini in order to override the default values.
 
 If your config_default.ini becomes somehow damaged, you can delete it and run the script in order to generate a new, clean copy.
+
+Index-specific options are have defaults defined under the `[DEFAULT]` section, and are overridden by any options defined in sections named after the respective index. Currently, the index-specific option is `blacklist_file`.
+
+## About blacklists
+HydrausNao now supports username blacklists. These blacklists are simple text files with one username per line.
+
+By default, a small DeviantArt blacklist with several users known for uploading other's work is included as an example, but not enabled.
+
+To enable it, add this block to your config.ini:
+```
+[da]
+blacklist_file = blacklist-deviantart.txt
+```
+If adding to this blacklist, it's recommended you copy the file and update your configuration to point to that instead. Any changes to the included text file may be removed upon updates to the script.
 
 ### Credits
 
