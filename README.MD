@@ -4,7 +4,7 @@ A script to automatically search SauceNao for images and send results to Hydrus 
 **Disclaimer:** I know basic coding, but have no prior experience with Python. Don't expect anything amazing.
 
 ## Requirements
-* Python 3.3+
+* Python 3.9+
 * Requests `pip install -U requests`
 * SauceNao-API `pip install -U saucenao_api`
 * Hydrus-API `pip install -U hydrus-api`
