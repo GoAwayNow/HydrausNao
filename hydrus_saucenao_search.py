@@ -1,4 +1,4 @@
-#!/usr/bin/env python -u
+#!/usr/bin/env python3 
 
 #Let me just preface this by saying "I don't know Python."
 #The only actual languages I've worked with previously are C++ and Pascal, and both were very limited experiences.
@@ -18,8 +18,8 @@ import os
 import subprocess
 import shutil
 import requests
-import hydrus
-import hydrus.utils
+import hydrus_api
+import hydrus_api.utils 
 from saucenao_api import SauceNao, errors as SauceNaoErrors
 #import codecs
 import time
@@ -125,9 +125,9 @@ if not hydrus_api_key  or not saucenao_api_key:
     print("Please update config.ini before continuing.")
     sys.exit(5)
 
-hydrus_permissions = [hydrus.Permission.SearchFiles, hydrus.Permission.ImportURLs]
+hydrus_permissions = [hydrus_api.Permission.SEARCH_FILES, hydrus_api.Permission.IMPORT_FILES]
 if meta_enable_tags:
-    hydrus_permissions.append(hydrus.Permission.AddTags)
+    hydrus_permissions.append(hydrus_api.Permission.ADD_TAGS)
     
     if meta_tag_namespace:
         if meta_tag_hit:
@@ -220,7 +220,7 @@ sauce = SauceNao(api_key=saucenao_api_key,
                 numres=sauce_numres,
 )
     
-client = hydrus.Client(hydrus_api_key, hydrus_api_url)
+client = hydrus_api.Client(hydrus_api_key, hydrus_api_url)
 
 if shutil.which('git') and os.path.exists('.git'):
     hn_revision = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD']).decode('ascii').strip()
@@ -239,12 +239,15 @@ if verbose_output:
     print('User-Agent:'+str(r_head['User-Agent']))
 
 try:
-    p = hydrus.utils.verify_permissions(client, hydrus_permissions)
+    p = hydrus_api.utils.verify_permissions(client, hydrus_permissions)
 except:
     print("Hydrus-API encountered a server error.\nHydrus API key may be malformed.")
+    print("Is the hydrus API set to HTTP?")
+    #print("Is the upnp port being forwarded?")
+    #print(err)
     sys.exit(6)
 else:
-    if not hydrus.utils.verify_permissions(client, hydrus_permissions):
+    if not hydrus_api.utils.verify_permissions(client, hydrus_permissions):
         print("The Hydrus API key does not grant all required permissions:", hydrus_permissions)
         sys.exit(1)
         
@@ -267,8 +270,8 @@ def tag_file(status):
         return
     
     try:
-        client.add_tags(hashes=line.splitlines(), service_to_tags={meta_tag_service: [final_tag]})
-    except hydrus.MissingParameter as e:
+        client.add_tags(hashes=line.splitlines(), service_names_to_tags={meta_tag_service: [final_tag]})
+    except hydrus_api.MissingParameter as e:
         print(str(e))
         print("A different tag service can be set in config.ini.\n"
             "Add a key called service to the Hydrus_Meta_Tags section and\nset it to the name of your tag service.\n\n"
@@ -323,7 +326,7 @@ def handle_results(results):
                 if r.status_code == 200:
                     print('hit! '+str(i.similarity), flush=True)
                     tag_file("hit")
-                    client.add_url(url=k, page_name=hydrus_page_name)
+                    client.add_url(url=k, destination_page_name=hydrus_page_name)
                     return
     else:
         print('miss... '+str(results[0].similarity), flush=True)
@@ -343,7 +346,14 @@ for line in hash_input:
         time.sleep(30)
         print("")
     short_pause = False
-    thumbnail = client.get_thumbnail(hash_=line)
+    try:
+        thumbnail = client.get_thumbnail(hash_=line)
+    except ConnectionError as err:
+        print("Is the hydrus API set to HTTP?")
+        print(err)
+        sys.exit(1)
+    except:
+        sys.exit(1)
     print("Processing hash: "+str(line).rstrip(), flush=True)
     
     retries = 0
